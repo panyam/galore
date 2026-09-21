@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@panyam/tsutils": "*",
-    "tlex": "*"
+    "tlex": "^1.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",

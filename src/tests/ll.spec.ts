@@ -105,3 +105,13 @@ describe("Parser Tests", () => {
     ]);
   });
 });
+
+describe("Parser Reuse Tests", () => {
+  test("Tests parse after a failed parse", () => {
+    const parser = newParser(Samples.expr2);
+    const expected = parser.parse("A+B*C")?.debugValue(false);
+    expect(expected).toBeTruthy();
+    expect(() => parser.parse("+")).toThrow();
+    expect(parser.parse("A+B*C")?.debugValue(false)).toEqual(expected);
+  });
+});
