@@ -333,3 +333,36 @@ describe("LRParsing Tokenizer Errors", () => {
     expect(errors.length).toEqual(2); // one for each "#"
   });
 });
+
+describe("LRParsing Parser Reuse", () => {
+  const single_id_tree = ["E", "A", [["T", "A", [["F", "A", [["id", "A"]]]]]]];
+
+  test("Test parse after a failed parse", () => {
+    const [parser] = newParser(test_grammar, { type: "slr" });
+    expect(parser.parse("A")?.debugValue()).toEqual(single_id_tree);
+    expect(() => parser.parse("+")).toThrow(ParseError);
+    expect(parser.parse("A")?.debugValue()).toEqual(single_id_tree);
+    expect(parser.parse("A")?.debugValue()).toEqual(single_id_tree);
+  });
+
+  test("Test parse after a rule handler throws", () => {
+    const vars = { a: 1, b: 2 } as any;
+    const [parser] = newParser(grammar_with_actions, { type: "slr" });
+    const config = {
+      ruleHandlers: {
+        mult: (rule: Rule, parent: PTNode, ...children: PTNode[]) => children[0].value * children[2].value,
+        add: (rule: Rule, parent: PTNode, ...children: PTNode[]) => children[0].value + children[2].value,
+        getVar: (rule: Rule, parent: PTNode, ...children: PTNode[]) => {
+          const varname = children[0].value;
+          if (!(varname in vars)) {
+            throw new Error("Variable not found: " + varname);
+          }
+          return vars[varname];
+        },
+      },
+    };
+    // z reduces while star is the lookahead, so the throw leaves a token buffered
+    expect(() => parser.parse("a+z*b", config)).toThrow("Variable not found: z");
+    expect(parser.parse("a+b", config)?.value).toEqual(3);
+  });
+});

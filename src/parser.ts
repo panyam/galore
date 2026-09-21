@@ -139,10 +139,19 @@ export abstract class ParserBase {
 }
 
 export abstract class SimpleParser extends ParserBase {
+  /**
+   * Parses the input and returns the resulting root Parse Tree node.
+   *
+   * Each call starts from an empty token buffer, so a parser can be reused
+   * after a parse that threw part way through and left the token it choked on
+   * buffered.  Note that tokens an earlier call peeked at but never consumed
+   * are dropped rather than re-read, since a Tape only moves forward.
+   */
   parse(input: string | TLEX.Tape, delegate: any = null): Nullable<PTNode> {
     if (typeof input === "string") {
       input = new TLEX.Tape(input);
     }
+    this.tokenbuffer?.reset();
     return this.parseInput(input, delegate);
   }
 
@@ -153,10 +162,19 @@ export abstract class SimpleParser extends ParserBase {
 }
 
 export abstract class ParallelParser extends ParserBase {
+  /**
+   * Parses the input and returns the resulting root Parse Tree node.
+   *
+   * Each call starts from an empty token buffer, so a parser can be reused
+   * after a parse that threw part way through and left the token it choked on
+   * buffered.  Note that tokens an earlier call peeked at but never consumed
+   * are dropped rather than re-read, since a Tape only moves forward.
+   */
   parse(input: string | TLEX.Tape, delegate: any = null): PFNode[] {
     if (typeof input === "string") {
       input = new TLEX.Tape(input);
     }
+    this.tokenbuffer?.reset();
     return this.parseInput(input, delegate);
   }
 

@@ -59,6 +59,28 @@ try {
 }
 </code></pre>
 
+<h3>Reusing a Parser After a Failure</h3>
+
+<p>A parser is safe to reuse once a parse has thrown. Every <code>parse()</code> call starts
+from an empty token buffer, so the token that caused the failure is discarded rather than
+read again by the next call:</p>
+
+<pre><code class="language-typescript">const [parser] = newParser(grammar, { type: "lalr" });
+
+try {
+  parser.parse(brokenInput);
+} catch (err) {
+  // nothing to clean up
+}
+
+parser.parse(goodInput); // parses normally
+</code></pre>
+
+<p>One caveat if you pass a <code>Tape</code> rather than a string. Tokens an earlier
+<code>parse()</code> peeked at but never consumed are dropped instead of being re-read,
+since a tape only moves forward, so consecutive calls sharing one tape lose the token at
+the boundary between them.</p>
+
 <h2>Error Callbacks</h2>
 
 <h3>onTokenError</h3>
