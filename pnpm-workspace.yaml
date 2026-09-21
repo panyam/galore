@@ -1,0 +1,5 @@
+allowBuilds:
+  pre-commit: true
+  spawn-sync: true
+minimumReleaseAgeExclude:
+  - tlex@1.1.0
