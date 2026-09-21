@@ -2,6 +2,25 @@
 
 ## Recently Completed
 
+### Parser Reuse Fix and CI (September 2026, v1.0.7)
+- Fixed issue 9: a parse that threw left its offending token in the parser's
+  `TokenBuffer`, so every later `parse()` on that parser reported the first
+  failure's error against input that parses cleanly on its own
+  - `parse()` now resets the buffer in `src/parser.ts`, covering the LR, LL and
+    GLR parsers in one place
+  - Uses `TokenBuffer.reset()`, added upstream in tlex 1.1.0 rather than worked
+    around here, so the `tlex` dependency moved from `*` to `^1.1.0`
+  - Reuse tests in `src/tests/lrparser.spec.ts` and `src/tests/ll.spec.ts`,
+    covering both a `ParseError` and a rule handler that throws
+  - Documented on the Error Handling reference page, including the caveat that
+    consecutive `parse()` calls sharing one `Tape` drop an unconsumed peeked token
+- Added CI (`.github/workflows/tests.yml`), which the repo had none of. Lint,
+  build and tests on node 20 and 22
+  - `pnpm-workspace.yaml` carries the pnpm settings that let a non-interactive
+    `pnpm install --frozen-lockfile` work at all
+  - The test step is scoped to `src/tests`, see Known Issues
+- Started `CHANGELOG.md` and `docs/releases/`, and added `CLAUDE.md`
+
 ### Documentation Improvements (January 2026)
 - Enhanced **Grammar DSL Reference** (`docs/content/reference/grammar-syntax/`)
   - Complete DSL syntax: rules, tokens, directives, EBNF extensions
@@ -117,7 +136,7 @@
 
 ## Known Issues
 
-### Samples Folder
+### Samples Folder (issue 12)
 The `samples/` subfolder has import issues - it imports `galore` as an external package rather than using relative paths. This causes test failures in:
 - `samples/src/json/tests/small.spec.ts`
 - `samples/src/c11/tests/t1.spec.ts`
@@ -126,6 +145,16 @@ Consider either:
 1. Setting up proper workspace/monorepo configuration
 2. Using relative imports in samples
 3. Publishing galore and installing it as a dependency
+
+CI scopes its test step to `src/tests` because of this, so the samples are
+unwatched rather than merely broken. Whichever option lands should also drop
+that scoping from `.github/workflows/tests.yml`.
+
+### GLR Returns an Empty Forest (issue 11)
+`glr.Parser.parseInput` runs the token loop and then returns `[]`, with the
+forest assembly still a TODO. Nothing about a GLR parse can be asserted from
+the outside, which is why the parser reuse fix covers GLR but has no test for
+it. Blocks progress on issue 2.
 
 ## Future Considerations
 
