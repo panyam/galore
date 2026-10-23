@@ -3,7 +3,7 @@
   "version": "1.0.7",
   "author": "Sriram Panyam",
   "description": "A toolbox for languages analyzers and parser generators.",
-  "homepage": "https://github.com/panyam/Galore#readme",
+  "homepage": "https://github.com/panyam/galore#readme",
   "license": "ISC",
   "types": "lib/cjs/index.d.ts",
   "main": "./lib/cjs/index.js",
@@ -13,14 +13,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/panyam/Galore.git"
+    "url": "git+https://github.com/panyam/galore.git"
   },
   "keywords": [
     "languages",
     "parsing"
   ],
   "bugs": {
-    "url": "https://github.com/panyam/Galore/issues"
+    "url": "https://github.com/panyam/galore/issues"
   },
   "dependencies": {
     "@panyam/tsutils": "*",
