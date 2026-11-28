@@ -4,7 +4,9 @@ Notable changes to galore. The format follows [Keep a Changelog](https://keepach
 
 Releases before v1.0.7 were tags without notes, and are not back-filled here.
 
-## [Unreleased]
+## [1.1.0] - 2026-11-27
+
+Full notes: `docs/releases/v1.1.0.md`.
 
 ### Added
 
