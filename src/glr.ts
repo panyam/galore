@@ -170,16 +170,17 @@ export class Parser extends ParserBase {
         break;
       }
     }
-    this.processShifts(nextSym, nextValue);
+    this.processShifts(nextSym, nextValue, token);
     // Advance the active vertex frontier
     this.U = this.Unext;
   }
 
-  processShifts(nextSym: Sym, nextValue: any): void {
+  processShifts(nextSym: Sym, nextValue: any, token: TLEX.Token | null = null): void {
     this.Unext = [];
     while (this.Q.length > 0) {
       const [v, s] = this.Q.pop()!;
       const pfn = this.sppf.addNode(nextSym, nextValue);
+      pfn.token = token;
       let created = false;
       for (const u of this.Unext) {
         if (u.stateId == s) {
