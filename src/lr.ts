@@ -293,6 +293,7 @@ export class Parser extends ParserBase {
       } else if (action.tag == LRActionType.SHIFT) {
         tokenbuffer.next(input);
         const newNode = new PTNode(idCounter++, nextSym, nextValue);
+        newNode.token = token;
         stack.push(action.gotoState!, newNode);
       } else {
         // reduce

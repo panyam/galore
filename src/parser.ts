@@ -36,6 +36,12 @@ export type NextTokenCallback = (token: TLEX.Token) => TSU.Nullable<TLEX.Token>;
 
 export class PFNode {
   children: this[] = [];
+
+  /**
+   * The token a terminal node was shifted from, so a caller can tell where in the input it came
+   * from. Null for a non-terminal, and for a node a caller built by hand.
+   */
+  token: Nullable<TLEX.Token> = null;
   constructor(
     public readonly id: number,
     public readonly sym: Sym,
@@ -56,6 +62,35 @@ export class PFNode {
 
   get isTerminal(): boolean {
     return this.sym.isTerminal;
+  }
+
+  /**
+   * Where this node starts in the input, as the index of its first character. A terminal takes
+   * its token's start. A non-terminal takes the start of its first child that covers any input,
+   * so a child dropped by a beforeAddingChildNode callback doesn't count. Null when the node
+   * covers no input, as an empty reduction doesn't.
+   */
+  get start(): number | null {
+    if (this.token) return this.token.start;
+    for (const child of this.children) {
+      const s = child.start;
+      if (s != null) return s;
+    }
+    return null;
+  }
+
+  /**
+   * Where this node ends in the input, as the index just past its last character. Like a token's
+   * end, it is exclusive, so the node's text is `input.substring(start, end)`. Null when the node
+   * covers no input.
+   */
+  get end(): number | null {
+    if (this.token) return this.token.end;
+    for (let i = this.children.length - 1; i >= 0; i--) {
+      const e = this.children[i].end;
+      if (e != null) return e;
+    }
+    return null;
   }
 
   add(node: this, index = -1): this {
